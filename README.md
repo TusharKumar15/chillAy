@@ -1,7 +1,9 @@
 # ChillAy: A web application to manage food orders for both customers and businesses
 
-> Used MERN stack to build this application. Mongoose for data management
+> Used MERN stack to build this application and Mongoose for data management
 
+
+☑️ What this application does:
 * The customer once logged in sees a list of eateries registered clicking on which directs them to their menu and on they can select the items and quantity and place orders.
 * In your orders section for the customer a list of orders is shown. As information about the order being served is given from the business side, the item is removed from this your orders section
 * The businesses can be logged in and registered similarly as user and then can edit thier menu and view the orders dashboard where the customers' detail and orders' detail are aslo visible
