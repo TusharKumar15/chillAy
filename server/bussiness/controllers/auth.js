@@ -1,0 +1,80 @@
+import shopMessage from "../models/addShop.js";
+import jwt from "jsonwebtoken";
+
+//handle errors
+const hanldleErrors = (err) => {
+    console.log(err.message, err.code);
+    let errors = {shopName: '', bussinessID: '', password: ''};
+    if(err.code === 11000) {
+        errors.bussinessID = 'Email already registered';
+        return errors;
+    }
+    
+    if(err.message.includes('shopSchema validation failed')) {
+        Object.values(err.errors).forEach(({properties}) => {
+            errors[properties.path] = properties.message;
+        });
+        return errors;
+    }
+}
+
+const hanldleErrorsLogin = (err) => {
+    console.log(err.message, err.code);
+    let errors = {bussinessID: '', password: ''};
+    if(err.message === 'incorrect Email'){
+        errors.bussinessID = 'This email does not exist'
+    }
+    else if(err.message === 'incorrect password'){
+        errors.password = 'wrong password';
+    }
+    return errors;
+}
+
+const createToken = (id) => {
+    return jwt.sign({id}, 'chillay secret');
+}
+
+const get_bussiness_signup = (req, res) => {
+    // res.send('signup');
+}
+
+const post_bussiness_signup = async (req, res) => {
+    // console.log(req.body);
+    const {shopName, shopStatus, bussinessID, password} = req.body; 
+    try{
+        const newShop = await shopMessage.create({shopName, shopStatus, bussinessID, password});
+        const token = createToken(newShop._id);
+        res.cookie('jwt', token);
+        res.status(201).json({ newShop });
+    }
+    catch(err){
+        const errors = hanldleErrors(err);
+        res.status(400).json({ errors });
+    }
+}
+
+const get_bussiness_login = (req, res) => {
+    // res.send('login');
+}
+
+const post_bussiness_login = async (req, res) => {
+    // console.log(req.body);
+    const {bussinessID, password} = req.body; 
+    try{
+        const shop = await shopMessage.login(bussinessID, password);
+        const token = createToken(shop._id);
+        res.cookie('jwt', token);
+        res.status(200).json({shop});
+    }
+    catch(err) {
+        const errors = hanldleErrorsLogin(err);
+        res.status(400).json({errors});
+    }
+}
+
+const logout = (req, res) => {
+    res.cookie('jwt', '', {maxAge: 1});
+    res.redirect('/');
+}
+
+export {get_bussiness_login, get_bussiness_signup, post_bussiness_signup, post_bussiness_login, logout};
